@@ -1,0 +1,46 @@
+import type { NextFunction, Request, Response } from "express";
+import jwt, { type JwtPayload } from "jsonwebtoken";
+import config from "../config";
+import { pool } from "../db";
+
+const auth = ()=>{
+    return async (req: Request, res: Response,next: NextFunction)=>{
+
+        const token = req.headers.authorization;
+
+        if(!token){
+            return res.status(401).json({
+                "success": false,
+                "message": "Unauthorized???"
+               })
+        }
+        
+        const decoded = jwt.verify(
+            token,
+            config.jwt_secret as string
+        ) as JwtPayload
+
+        const userData = await pool.query(`
+            SELECT * FROM users WHERE id = $1
+        `,[decoded.id]);
+
+        if(userData.rows.length === 0) {
+            return res.status(401).json({
+                "success": false,
+                "message": "Unauthorized||"
+               })
+        }
+        console.log(userData.rows[0].role)
+        if(userData.rows[0].role !== 'contributor' && userData.rows[0].role !== 'maintainer') {
+            return res.status(401).json({
+                "success": false,
+                "message": "Unauthorized..."
+               })
+        }
+        const user = userData.rows[0];  
+        req.user = user;
+        next();
+    }
+}
+
+export default auth
