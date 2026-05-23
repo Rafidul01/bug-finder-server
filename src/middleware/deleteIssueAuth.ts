@@ -3,7 +3,7 @@ import jwt, { type JwtPayload } from "jsonwebtoken";
 import config from "../config";
 import { pool } from "../db";
 
-const auth = (...roles: string[])=>{
+const deleteIssueAuth = (...roles: string[])=>{
 
     return async (req: Request, res: Response,next: NextFunction)=>{
 
@@ -12,7 +12,7 @@ const auth = (...roles: string[])=>{
         if(!token){
             return res.status(401).json({
                 "success": false,
-                "message": "Unauthorized???"
+                "message": "Unauthorized"
                })
         }
         
@@ -28,14 +28,14 @@ const auth = (...roles: string[])=>{
         if(userData.rows.length === 0) {
             return res.status(401).json({
                 "success": false,
-                "message": "Unauthorized||"
+                "message": "Unauthorized"
                })
         }
-        
-        if(roles.length && !roles.includes(userData.rows[0].role)){
+       
+        if(roles.length && userData.rows[0].role !== "maintainer") {
             return res.status(401).json({
                 "success": false,
-                "message": "Unauthorized..."
+                "message": "Unauthorized"
                })
         }
         const user = userData.rows[0];  
@@ -44,4 +44,4 @@ const auth = (...roles: string[])=>{
     }
 }
 
-export default auth
+export default deleteIssueAuth
