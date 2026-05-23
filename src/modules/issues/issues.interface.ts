@@ -9,3 +9,9 @@ export interface IIssue{
     status?: 'open' | 'in_progress' | 'resolved',
     role?: 'contributor' | 'maintainer'
 }
+
+export interface IQuery{
+    sort: 'newest' | 'oldest',
+    type: 'bug' | 'feature_request',
+    status: 'open' | 'in_progress' | 'resolved'
+}
