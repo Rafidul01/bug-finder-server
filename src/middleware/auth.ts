@@ -3,7 +3,8 @@ import jwt, { type JwtPayload } from "jsonwebtoken";
 import config from "../config";
 import { pool } from "../db";
 
-const auth = ()=>{
+const auth = (...roles: string[])=>{
+
     return async (req: Request, res: Response,next: NextFunction)=>{
 
         const token = req.headers.authorization;
@@ -31,7 +32,13 @@ const auth = ()=>{
                })
         }
         console.log(userData.rows[0].role)
-        if(userData.rows[0].role !== 'contributor' && userData.rows[0].role !== 'maintainer') {
+        // if(userData.rows[0].role !== 'contributor' && userData.rows[0].role !== 'maintainer') {
+        //     return res.status(401).json({
+        //         "success": false,
+        //         "message": "Unauthorized..."
+        //        })
+        // }
+        if(roles.length && !roles.includes(userData.rows[0].role)){
             return res.status(401).json({
                 "success": false,
                 "message": "Unauthorized..."
