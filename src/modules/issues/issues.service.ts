@@ -29,9 +29,7 @@ const getAllIssuesFromDB = async (payload: IQuery) => {
       [type, status],
     );
 
-  }
-
-  if (type) {
+  }else if (type) {
     result = await pool.query(
       `
             SELECT * FROM issues WHERE type = $1 ORDER BY created_at ${order}
@@ -39,9 +37,7 @@ const getAllIssuesFromDB = async (payload: IQuery) => {
       [type],
     );
     
-  }
-
-  if (status) {
+  }else if (status) {
      result = await pool.query(
       `
             SELECT * FROM issues WHERE status = $1 ORDER BY created_at ${order}
@@ -50,9 +46,7 @@ const getAllIssuesFromDB = async (payload: IQuery) => {
     );
 
    
-  }
-
-  if(!type && !status){
+  }else if(!type && !status){
     result = await pool.query(
       `
             SELECT * FROM issues ORDER BY created_at ${order}

@@ -193,24 +193,21 @@ var getAllIssuesFromDB = async (payload) => {
         `,
       [type, status]
     );
-  }
-  if (type) {
+  } else if (type) {
     result = await pool.query(
       `
             SELECT * FROM issues WHERE type = $1 ORDER BY created_at ${order}
         `,
       [type]
     );
-  }
-  if (status) {
+  } else if (status) {
     result = await pool.query(
       `
             SELECT * FROM issues WHERE status = $1 ORDER BY created_at ${order}
         `,
       [status]
     );
-  }
-  if (!type && !status) {
+  } else if (!type && !status) {
     result = await pool.query(
       `
             SELECT * FROM issues ORDER BY created_at ${order}
