@@ -1,9 +1,9 @@
-import type { Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { pool } from "../../db";
 import { authService } from "./auth.service";
 import sendResponse from "../../utility/sendResponse";
 
-const userRegister = async (req: Request, res: Response) => {
+const userRegister = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await authService.registerUserIntoDB(req.body);
     
@@ -14,16 +14,11 @@ const userRegister = async (req: Request, res: Response) => {
       data: result
     })
   } catch (error) {
-    sendResponse(res, {
-      statusCode: 400,
-      success: false,
-      message: "User registration failed",
-      error: error
-    })
+    next(error);
   }
 };
 
-const userLogin = async (req: Request, res: Response) => {
+const userLogin = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await authService.loginUserIntoDB(req.body);
 
@@ -34,13 +29,8 @@ const userLogin = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (error) {
+    next(error);
     
-    sendResponse(res, {
-      statusCode: 401,
-      success: false,
-      message: "User login failed",
-      error: error,
-    })
   }
 };
 

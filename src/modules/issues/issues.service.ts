@@ -1,4 +1,5 @@
 import { pool } from "../../db";
+import AppError from "../../utility/AppError";
 import type { IIssue, IQuery } from "./issues.interface";
 
 const createIssueIntoDB = async (payload: IIssue) => {
@@ -60,11 +61,11 @@ const getAllIssuesFromDB = async (payload: IQuery) => {
   }
 
   if (!result) {
-    throw new Error("No issues found");
+    throw new AppError("Something went wrong", 400);
   }
 
   if (result?.rows.length === 0) {
-    throw new Error("No issues found");
+    throw new AppError("Something went wrong", 400);
   }
 
   const reporterId = result?.rows.map((issue) => issue.reporter_id);

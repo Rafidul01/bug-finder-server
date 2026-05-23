@@ -2,6 +2,7 @@ import type { NextFunction, Request, Response } from "express";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import config from "../config";
 import { pool } from "../db";
+import sendResponse from "../utility/sendResponse";
 
 const deleteIssueAuth = (...roles: string[])=>{
 
@@ -10,10 +11,13 @@ const deleteIssueAuth = (...roles: string[])=>{
         const token = req.headers.authorization;
 
         if(!token){
-            return res.status(401).json({
-                "success": false,
-                "message": "Unauthorized"
-               })
+            return sendResponse(res, {
+                statusCode: 401,
+                success: false,
+                message: "Unauthorized",
+                error: "Invalid token"
+            }) 
+            
         }
         
         const decoded = jwt.verify(
@@ -26,16 +30,19 @@ const deleteIssueAuth = (...roles: string[])=>{
         `,[decoded.id]);
 
         if(userData.rows.length === 0) {
-            return res.status(401).json({
-                "success": false,
-                "message": "Unauthorized"
-               })
+            return sendResponse(res, {
+                statusCode: 401,
+                success: false,
+                message: "Unauthorized",
+                error: "User not found"
+            })
         }
        
         if(roles.length && userData.rows[0].role !== "maintainer") {
             return res.status(401).json({
                 "success": false,
-                "message": "Unauthorized"
+                "message": "Unauthorized",
+                "error": "Access denied"
                })
         }
         const user = userData.rows[0];  

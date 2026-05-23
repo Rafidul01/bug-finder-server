@@ -1,9 +1,9 @@
-import type { Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { issueService } from "./issues.service";
 import type { IQuery } from "./issues.interface";
 import sendResponse from "../../utility/sendResponse";
 
-const cretateIssue = async (req: Request, res: Response) => {
+const cretateIssue = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await issueService.createIssueIntoDB({
       ...req.body,
@@ -17,17 +17,11 @@ const cretateIssue = async (req: Request, res: Response) => {
       data: result
     })
   } catch (error) {
-    
-    sendResponse(res, {
-      statusCode: 400,
-      success: false,
-      message: "Issue creation failed",
-      error: error
-    })
+    next(error);
   }
 };
 
-const getAllIssues = async (req: Request, res: Response) => {
+const getAllIssues = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const sort = req.query.sort as "newest" | "oldest";
     const type = req.query.type as "bug" | "feature_request";
@@ -37,6 +31,7 @@ const getAllIssues = async (req: Request, res: Response) => {
       sort,
       type,
       status,
+      
     });
 
 
@@ -47,16 +42,11 @@ const getAllIssues = async (req: Request, res: Response) => {
       data: result
     })
   } catch (error) {
-    sendResponse(res, {
-      statusCode: 400,
-      success: false,
-      message: "Issue fetching failed",
-      error: error
-    })
+    next(error);
   }
 };
 
-const getSingleIssue = async (req: Request, res: Response) => {
+const getSingleIssue = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const id = req.params.id as string;
     const result = await issueService.getSingleIssueFromDB(id);
@@ -68,17 +58,13 @@ const getSingleIssue = async (req: Request, res: Response) => {
     })
 
   } catch (error) {
-    sendResponse(res, {
-      statusCode: 400,
-      success: false,
-      message: "Issue fetching failed",
-      error: error
-    })
+    console.log(error);
+    next(error);
     
   }
 };
 
-const updateIssue = async (req: Request, res: Response) => {
+const updateIssue = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const id = req.params.id as string;
     const result = await issueService.updateIssueIntoDB(id, req.body);
@@ -91,15 +77,10 @@ const updateIssue = async (req: Request, res: Response) => {
     })
 
   } catch (error) {
-    sendResponse(res, {
-      statusCode: 400,
-      success: false,
-      message: "Issue updating failed",
-      error: error
-    })
+    next(error);
   }
 };
-const deleteIssue = async (req: Request, res: Response) => {
+const deleteIssue = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const id = req.params.id as string;
     await issueService.deleteIssueFromDB(id);
@@ -111,12 +92,7 @@ const deleteIssue = async (req: Request, res: Response) => {
     })
 
   } catch (error) {
-    sendResponse(res, {
-      statusCode: 400,
-      success: false,
-      message: "Issue deleting failed",
-      error: error
-    })
+    next(error);
 
   }
 };

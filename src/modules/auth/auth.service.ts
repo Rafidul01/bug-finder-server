@@ -3,6 +3,7 @@ import { pool } from '../../db';
 import type { Iuser } from './auth.interface';
 import jwt from 'jsonwebtoken';
 import config from '../../config';
+import AppError from '../../utility/AppError';
 const registerUserIntoDB = async (payload : Iuser) =>{
     const {name,email,password,role} = payload;
 
@@ -29,13 +30,11 @@ const loginUserIntoDB = async (payload: {
         SELECT * FROM users WHERE email = $1
     `,[email]);
 
-    if(userData.rows.length === 0) throw new Error('User not found');
+    if(userData.rows.length === 0) throw new AppError('User not found',404);
     const user = userData.rows[0];  
     const isPasswordMatch = await bcrypt.compare(password,user.password);
     if(!isPasswordMatch){
-        const error = new Error ('Invalid password');
-        error.message = "Invalid passworddd";
-        throw error;
+        throw new AppError('Invalid password',401);
     }
 
     const jwtpayload = {
