@@ -67,8 +67,28 @@ const getSingleIssue = async (req: Request, res: Response) => {
   }
 };
 
+const updateIssue = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id as string;
+    const result = await issueService.updateIssueIntoDB(id, req.body);
+
+    res.status(200).json({
+      success: true,
+      message: "Issue updated successfully",
+      data: result,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: "Issue updating failed",
+      error: error,
+    });
+  }
+};
+
 export const issueController = {
   cretateIssue,
   getAllIssues,
-  getSingleIssue
+  getSingleIssue,
+  updateIssue
 };
